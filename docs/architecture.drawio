@@ -1,0 +1,92 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="tm-arch" name="TravelMemory Deployment">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;TravelMemory (MERN) – Deployment Architecture&lt;/b&gt;&lt;br&gt;AWS ap-southeast-2 (Sydney) · Cloudflare · MongoDB Atlas" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;" vertex="1" parent="1">
+          <mxGeometry x="450" y="10" width="700" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="aws" value="AWS Cloud – Region ap-southeast-2 (Sydney)" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#FFF8EE;strokeColor=#FF9900;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="880" height="620" as="geometry"/>
+        </mxCell>
+        <mxCell id="vpc" value="Default VPC" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#8C4FFF;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=10;fontStyle=1;fontColor=#8C4FFF;" vertex="1" parent="1">
+          <mxGeometry x="420" y="115" width="840" height="570" as="geometry"/>
+        </mxCell>
+        <mxCell id="az2c" value="Availability Zone ap-southeast-2c" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#EEF6FF;strokeColor=#147EBA;dashed=1;verticalAlign=top;align=left;spacingLeft=10;fontColor=#147EBA;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="150" width="470" height="250" as="geometry"/>
+        </mxCell>
+        <mxCell id="az2a" value="Availability Zone ap-southeast-2a" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#EEF6FF;strokeColor=#147EBA;dashed=1;verticalAlign=top;align=left;spacingLeft=10;fontColor=#147EBA;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="420" width="470" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="user" value="Users&lt;br&gt;(Browser)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="330" width="40" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="admin" value="Admin&lt;br&gt;(SSH from allowed IP)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="590" width="40" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cf" value="&lt;b&gt;Cloudflare&lt;/b&gt;&lt;br&gt;DNS + Proxy + TLS (Flexible)&lt;br&gt;Always Use HTTPS&lt;hr&gt;&lt;font style=&quot;font-size:11px&quot;&gt;CNAME travelmemory → ALB&lt;br&gt;A travelmemory-fe → 13.210.209.50&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD7;strokeColor=#F38020;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="150" y="290" width="210" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="alb" value="&lt;b&gt;Application Load Balancer&lt;/b&gt;&lt;br&gt;tm-alb (internet-facing)&lt;br&gt;Listener HTTP:80 → tm-tg&lt;br&gt;Health check: GET /&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;SG: tm-alb-sg (80/443)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7D5FF;strokeColor=#8C4FFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="470" y="335" width="210" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ec2a" value="&lt;b&gt;EC2-1: tm-app-1&lt;/b&gt; (t3.micro, Ubuntu 24.04, EBS encrypted)&lt;br&gt;Elastic IP 13.210.209.50&lt;hr&gt;&lt;b&gt;nginx :80&lt;/b&gt;&lt;br&gt;/ → React build (/var/www/travelmemory)&lt;br&gt;/api/ → proxy → Node.js :3000 (pm2)&lt;hr&gt;&lt;font style=&quot;font-size:11px&quot;&gt;SG: tm-app-sg (80 from ALB, 22 from admin IP)&lt;br&gt;+ tm-direct-sg (80 from Cloudflare IPs only)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="185" width="420" height="195" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec2b" value="&lt;b&gt;EC2-2: tm-app-2&lt;/b&gt; (launched from AMI tm-app-ami-v1)&lt;br&gt;Elastic IP 54.153.208.35&lt;hr&gt;&lt;b&gt;nginx :80&lt;/b&gt;&lt;br&gt;/ → React build (/var/www/travelmemory)&lt;br&gt;/api/ → proxy → Node.js :3000 (pm2)&lt;hr&gt;&lt;font style=&quot;font-size:11px&quot;&gt;SG: tm-app-sg (80 from ALB, 22 from admin IP)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="455" width="420" height="195" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="atlas" value="&lt;b&gt;MongoDB Atlas&lt;/b&gt;&lt;br&gt;M0 cluster – AWS Sydney&lt;br&gt;DB: travelmemory&lt;hr&gt;&lt;font style=&quot;font-size:11px&quot;&gt;IP access list: 2 Elastic IPs only&lt;br&gt;User tmadmin: readWriteAnyDatabase,&lt;br&gt;scoped to this cluster&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#00684A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="325" width="230" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="notes" value="&lt;b&gt;Security &amp;amp; resilience&lt;/b&gt;&lt;br&gt;• Port 3000 never exposed – only nginx :80&lt;br&gt;• Instances in 2 AZs behind ALB health checks&lt;br&gt;• pm2 auto-restart on reboot&lt;br&gt;• IMDSv2 required, encrypted EBS&lt;br&gt;• Secrets only in .env (chmod 600, git-ignored)&lt;br&gt;• nginx server_tokens off" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#F5F5F5;strokeColor=#999999;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="520" width="290" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" value="HTTPS" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1" source="user" target="cf">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="HTTP via CNAME&lt;br&gt;travelmemory.kamalvasvani.com" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F38020;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="cf" target="alb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="HTTP via A record&lt;br&gt;travelmemory-fe.kamalvasvani.com" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F38020;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="cf" target="ec2a">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="255" y="230"/>
+              <mxPoint x="760" y="230"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTP:80 (tm-tg)" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8C4FFF;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="alb" target="ec2a">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="HTTP:80 (tm-tg)" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8C4FFF;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="alb" target="ec2b">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="mongodb+srv (TLS)" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#00684A;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="ec2a" target="atlas">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="mongodb+srv (TLS)" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#00684A;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="ec2b" target="atlas">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="SSH :22 (key tm-key)" style="endArrow=classic;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="admin" target="ec2b">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="625"/>
+              <mxPoint x="740" y="552"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
